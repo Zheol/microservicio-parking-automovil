@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "path/to/your/package/userpb";
+
+// Definición del servicio de usuario
+service UserService {
+  rpc GetUsers (GetUsersRequest) returns (GetUsersResponse);
+  rpc GetUser (GetUserRequest) returns (GetUserResponse);
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse);
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc Validate (ValidateRequest) returns (ValidateResponse);
+}
+
+// Definición de mensajes
+message User {
+  uint64 id = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4;
+  bool tipoUser = 5;
+  string created_at = 6;
+  string updated_at = 7;
+  string deleted_at = 8;
+}
+
+message GetUsersRequest {}
+
+message GetUsersResponse {
+  repeated User users = 1;
+}
+
+message GetUserRequest {
+  uint64 id = 1;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+  bool tipoUser = 4;
+}
+
+message CreateUserResponse {
+  User user = 1;
+}
+
+message DeleteUserRequest {
+  uint64 id = 1;
+}
+
+message DeleteUserResponse {}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}
+
+message ValidateRequest {
+  string token = 1;
+}
+
+message ValidateResponse {
+  User user = 1;
+}
