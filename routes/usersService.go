@@ -72,7 +72,7 @@ func (s *UserServiceServer) CreateUser(ctx context.Context, req *userpb.CreateUs
 	if createdUser.Error != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to create user: %v", createdUser.Error)
 	}
-	log.Printf("Usuario creado en la base de datos: %+v", user)
+	log.Printf("Usuario creado en la base de datox: %+v", user)
 	return &userpb.CreateUserResponse{
 		User: &userpb.User{
 			Id:       uint64(user.ID),
