@@ -4,6 +4,7 @@ package user;
 
 option go_package = "path/to/your/package/userpb";
 
+
 // Definición del servicio de usuario
 service UserService {
   rpc GetUsers (GetUsersRequest) returns (GetUsersResponse);
