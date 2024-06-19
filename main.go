@@ -26,7 +26,6 @@ func main() {
 
 	db.DB.AutoMigrate(models.User{})
 
-	
 	lis, err := net.Listen("tcp", ":8089")
 
 	if err != nil {
