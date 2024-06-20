@@ -97,36 +97,38 @@ func (s *UserServiceServer) DeleteUser(ctx context.Context, req *userpb.DeleteUs
 }
 
 func (s *UserServiceServer) Login(ctx context.Context, req *userpb.LoginRequest) (*userpb.LoginResponse, error) {
-	var user models.User
-	db.DB.First(&user, "email = ?", req.Email)
+    var user models.User
+    db.DB.First(&user, "email = ?", req.Email)
 
-	if user.ID == 0 {
-		return nil, status.Errorf(codes.NotFound, "Invalid email or password")
-	}
+    if user.ID == 0 {
+        return nil, status.Errorf(codes.NotFound, "Invalid email or password")
+    }
 
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
-	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "Invalid email or password")
-	}
+    err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+    if err != nil {
+        return nil, status.Errorf(codes.NotFound, "Invalid email or password")
+    }
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": user.ID,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
-	})
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+        "sub": user.ID,
+        "name": user.Name,
+        "exp": time.Now().Add(time.Hour * 24).Unix(),
+    })
 
-	secret := os.Getenv("SECRET")
-	if secret == "" {
-		log.Println("SECRET environment variable is not set")
-		return nil, status.Errorf(codes.Internal, "Internal server error")
-	}
+    secret := os.Getenv("SECRET")
+    if secret == "" {
+        log.Println("SECRET environment variable is not set")
+        return nil, status.Errorf(codes.Internal, "Internal server error")
+    }
 
-	tokenString, err := token.SignedString([]byte(secret))
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to create token: %v", err)
-	}
+    tokenString, err := token.SignedString([]byte(secret))
+    if err != nil {
+        return nil, status.Errorf(codes.Internal, "Failed to create token: %v", err)
+    }
 
-	return &userpb.LoginResponse{Token: tokenString}, nil
+    return &userpb.LoginResponse{Token: tokenString}, nil
 }
+
 
 func (s *UserServiceServer) Validate(ctx context.Context, req *userpb.ValidateRequest) (*userpb.ValidateResponse, error) {
 	token, err := jwt.Parse(req.Token, func(token *jwt.Token) (interface{}, error) {
