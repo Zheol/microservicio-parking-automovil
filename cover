@@ -52,4 +52,5 @@ github.com/Zheol/microservicio-parking-users/routes/usersService.go:156.18,158.3
 github.com/Zheol/microservicio-parking-users/routes/usersService.go:160.2,168.8 1 1
 github.com/Zheol/microservicio-parking-users/database/connection.go:14.21,17.18 3 1
 github.com/Zheol/microservicio-parking-users/database/connection.go:17.18,19.3 1 0
-github.com/Zheol/microservicio-parking-users/database/connection.go:19.7,21.3 1 1
+github.com/Zheol/microservicio-parking-users/database/connection.go:19.8,21.3 1 1
+github.com/Zheol/microservicio-parking-users/database/connection.go:24.2,25.34 2 1

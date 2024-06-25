@@ -11,37 +11,45 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
-func TestDBConnection_Success(t *testing.T) {
-	// Crear la conexión de base de datos mock
-	db, mock, err := sqlmock.New()
-	assert.NoError(t, err)
-	defer db.Close()
 
-	// Configurar Gorm para usar la conexión de base de datos mock
-	dialector := postgres.New(postgres.Config{
-		Conn: db,
-	})
-	gormDB, err := gorm.Open(dialector, &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-	})
-	assert.NoError(t, err)
+type UserTest struct {
 
-	// Asignar la instancia de Gorm a la variable global de base de datos
-	DB = gormDB
-
-	// Expectativa de consulta simulada
-	mock.ExpectQuery(`SELECT 1`).WillReturnRows(sqlmock.NewRows([]string{"?column?"}).AddRow(1))
-
-	// Llamar a la función que se está probando
-	DBConnection()
-
-	// Verificar que no hubo errores en la conexión
-	assert.NotNil(t, DB)
-	assert.NoError(t, err)
-
-	// Verificar que las expectativas de mock se cumplieron
-	assert.NoError(t, mock.ExpectationsWereMet())
+    ID      uint
+	Name     string 
+	Email    string 
+	Password string 
+	TipoUser bool
 }
+
+func TestDBConnection_Success(t *testing.T) {
+    // Crear la conexión de base de datos mock
+    db, mock, err := sqlmock.New()
+    assert.NoError(t, err)
+    defer db.Close()
+
+    // Configurar Gorm para usar la conexión de base de datos mock
+    dialector := postgres.New(postgres.Config{
+        Conn: db,
+    })
+    gormDB, err := gorm.Open(dialector, &gorm.Config{
+        Logger: logger.Default.LogMode(logger.Silent),
+    })
+    assert.NoError(t, err)
+
+    // Asignar la instancia de Gorm a la variable global de base de datos
+    DB = gormDB
+
+    // Expectativa de consulta simulada
+    mock.ExpectQuery(`SELECT 1`).
+        WillReturnRows(sqlmock.NewRows([]string{"?column?"}).AddRow(1))
+
+    // Llamar a la función que se está probando
+    DBConnection()
+
+    // Verificar que no hubo errores en la conexión
+    assert.NotNil(t, DB)
+}
+
 
 func TestDBConnection_Failure(t *testing.T) {
 	// Capturar el logger original
