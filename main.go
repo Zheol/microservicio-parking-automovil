@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 
-	"github.com/Zheol/microservicio-parking-users/db"
+	"github.com/Zheol/microservicio-parking-users/database"
 	"github.com/Zheol/microservicio-parking-users/models"
 	"github.com/Zheol/microservicio-parking-users/routes"
 	userpb "github.com/Zheol/microservicio-parking-users/user"
@@ -22,9 +22,9 @@ func init() {
 
 func main() {
 
-	db.DBConnection()
+	database.DBConnection()
 
-	db.DB.AutoMigrate(models.User{})
+	database.DB.AutoMigrate(models.User{})
 
 	lis, err := net.Listen("tcp", ":8089")
 

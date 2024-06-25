@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Zheol/microservicio-parking-users/db"
+	"github.com/Zheol/microservicio-parking-users/database"
 	"github.com/Zheol/microservicio-parking-users/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -41,8 +41,9 @@ func RequireAuth(c *gin.Context) {
         }
 
         if sub, ok := claims["sub"].(float64); ok {
+            userID := int64(sub)
             var user models.User
-            db.DB.First(&user, sub)
+            database.DB.First(&user, userID)
             if user.ID == 0 {
                 fmt.Println("User not found in database")
                 c.AbortWithStatus(http.StatusUnauthorized)

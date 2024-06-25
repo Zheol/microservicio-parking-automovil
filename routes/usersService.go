@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Zheol/microservicio-parking-users/db"
+	"github.com/Zheol/microservicio-parking-users/database"
 	"github.com/Zheol/microservicio-parking-users/models"
 	userpb "github.com/Zheol/microservicio-parking-users/user"
 	"github.com/golang-jwt/jwt/v5"
@@ -21,7 +21,7 @@ type UserServiceServer struct {
 
 func (s *UserServiceServer) GetUsers(ctx context.Context, req *userpb.GetUsersRequest) (*userpb.GetUsersResponse, error) {
 	var users []models.User
-	db.DB.Find(&users)
+	database.DB.Find(&users)
 
 	var pbUsers []*userpb.User
 	for _, user := range users {
@@ -38,7 +38,7 @@ func (s *UserServiceServer) GetUsers(ctx context.Context, req *userpb.GetUsersRe
 
 func (s *UserServiceServer) GetUser(ctx context.Context, req *userpb.GetUserRequest) (*userpb.GetUserResponse, error) {
 	var user models.User
-	db.DB.First(&user, req.Id)
+	database.DB.First(&user, req.Id)
 
 	if user.ID == 0 {
 		return nil, status.Errorf(codes.NotFound, "User not found")
@@ -68,7 +68,7 @@ func (s *UserServiceServer) CreateUser(ctx context.Context, req *userpb.CreateUs
 		TipoUser: req.TipoUser,
 	}
 
-	createdUser := db.DB.Create(&user)
+	createdUser := database.DB.Create(&user)
 	if createdUser.Error != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to create user: %v", createdUser.Error)
 	}
@@ -86,19 +86,19 @@ func (s *UserServiceServer) CreateUser(ctx context.Context, req *userpb.CreateUs
 
 func (s *UserServiceServer) DeleteUser(ctx context.Context, req *userpb.DeleteUserRequest) (*userpb.DeleteUserResponse, error) {
 	var user models.User
-	db.DB.First(&user, req.Id)
+	database.DB.First(&user, req.Id)
 
 	if user.ID == 0 {
 		return nil, status.Errorf(codes.NotFound, "User not found")
 	}
 
-	db.DB.Delete(&user)
+	database.DB.Delete(&user)
 	return &userpb.DeleteUserResponse{}, nil
 }
 
 func (s *UserServiceServer) Login(ctx context.Context, req *userpb.LoginRequest) (*userpb.LoginResponse, error) {
     var user models.User
-    db.DB.First(&user, "email = ?", req.Email)
+    database.DB.First(&user, "email = ?", req.Email)
 
     if user.ID == 0 {
         return nil, status.Errorf(codes.NotFound, "Invalid email or password")
@@ -144,8 +144,14 @@ func (s *UserServiceServer) Validate(ctx context.Context, req *userpb.ValidateRe
 		return nil, status.Errorf(codes.Internal, "Invalid token claims")
 	}
 
+	// Asegúrate de que el sub claim sea un int64
+	userID, ok := claims["sub"].(float64)
+	if !ok {
+		return nil, status.Errorf(codes.Internal, "Invalid token claims")
+	}
+
 	var user models.User
-	db.DB.First(&user, claims["sub"])
+	database.DB.First(&user, int64(userID))
 
 	if user.ID == 0 {
 		return nil, status.Errorf(codes.NotFound, "User not found")
